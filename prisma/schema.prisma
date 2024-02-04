@@ -26,19 +26,30 @@ model Barbershop {
   name     String
   address  String
   imageUrl String
-  bookings Booking[]
   services Service[]
+  bookings Booking[]
 }
 
 model Service {
   id           String     @id @default(uuid())
+  name         String
+  price        Decimal    @db.Decimal(10, 2)
   barbershopId String
   barbershop   Barbershop @relation(fields: [barbershopId], references: [id])
-  name         String
   description  String
-  price        Decimal    @db.Decimal(10, 2)
-  imageUrl    String
   bookings     Booking[]
+  imageUrl     String
+}
+
+model Booking {
+  id          String     @id @default(uuid())
+  userId      String
+  user        User       @relation(fields: [userId], references: [id])
+  serviceId   String
+  service     Service    @relation(fields: [serviceId], references: [id])
+  barbershopId String
+  barbershop  Barbershop @relation(fields: [barbershopId], references: [id])
+  date        DateTime
 }
 
 model Account {
@@ -68,8 +79,6 @@ model Session {
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-
-
 model VerificationToken {
   identifier String
   token      String   @unique
@@ -77,17 +86,3 @@ model VerificationToken {
 
   @@unique([identifier, token])
 }
-
-
-
-model Booking {
-  id           String     @id @default(uuid())
-  barbershopId String
-  barbershop   Barbershop @relation(fields: [barbershopId], references: [id])
-  serviceId    String
-  service      Service    @relation(fields: [serviceId], references: [id])
-  userId       String
-  user         User       @relation(fields: [userId], references: [id])
-  date         DateTime   @db.Timestamp
-}
-
